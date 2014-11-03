@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- link rel="stylesheet" href="css/normalize.min.css" -->
+        <!-- link rel="stylesheet" href="css/main.css" -->
+
+    </head>
+    <body>
+
+        <h2>Dayrider</h2>
+
+        <p>Control the dayrider with the arrow keys!</p>
+
+        <p id="spinner" style="display:none">Please wait..</p>
+
+        <ul class="errors"></ul>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <!-- script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')</script -->
+
+        <script>
+var onkeydown = function(e) {
+    e = e || window.event;
+    if (e.keyCode == 38) {
+       dir = 'forward';
+    } else if (e.keyCode == 40){
+       dir ='backward';
+    } else if (e.keyCode == 37){
+       dir = 'left';
+    } else if (e.keyCode == 39){
+       dir = 'right';
+    } else {
+       return;
+    }
+
+    $('spinner').show();
+    $(document).unbind('keydown');
+    xhr = jQuery.get('/mailbox/' + dir);
+    xhr.always(function() {
+         $('spinner').hide();
+         $(document).keydown(onkeydown);
+    });
+    xhr.fail(function() {
+         $('.errors').append("<li>Error sending event "+dir+"</li>");
+    });
+
+};
+
+$(document).ready(function() {
+    $(document).keydown(onkeydown);
+});
+</script>
+    </body>
+</html>
