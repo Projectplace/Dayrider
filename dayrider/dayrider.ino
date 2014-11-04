@@ -3,10 +3,11 @@
 
 #include <Dagu4Motor.h>
 
-//YunServer server;
-              // pwn, dir, cur(analog), encA, encB 
-Dagu4Motor left(11, 12, 0, 0, 0);
-Dagu4Motor right(3, 2, 0, 0, 0);
+                 // pwm, dir, cur(analog), encA, encB 
+Dagu4Motor left_front(5, 4, 0, 0, 0);
+Dagu4Motor left_back(3, 2, 0, 0, 0);
+Dagu4Motor right_front(11, 12, 0, 0, 0);
+Dagu4Motor right_back(9, 8, 0, 0, 0);
 
 void setup() {
   //Serial.begin(9600);
@@ -15,11 +16,15 @@ void setup() {
   Bridge.begin();
   Mailbox.begin();
   digitalWrite(13, HIGH);
-  
-  //Serial.println("Starting Dayrider 0.1");
-  
-  left.begin();
-  left.stopMotors();
+    
+  left_front.begin();
+  left_front.stopMotors();
+  left_back.begin();
+  left_back.stopMotors();
+  right_front.begin();
+  right_front.stopMotors();
+  right_back.begin();
+  right_back.stopMotors();
   
 }
 
@@ -28,18 +33,20 @@ void loop() {
     process_cmd();
   }
 
-  delay(50); 
+  delay(10); 
 }
 
 #define LEFT 1
 #define RIGHT 2
 #define FORWARD 3
 #define BACKWARD 4
+#define FORWARD_LEFT 5
+#define FORWARD_RIGHT 6
 
 #define MOTOR_FORWARD 0
-#define MOTOR_BACKWARD 1
+#define MOTOR_BACKWARDS 1
 
-#define MOTOR_SPEED 150
+#define MOTOR_SPEED 100
 
 int current_direction = 0;
 
@@ -61,17 +68,37 @@ void process_cmd() {
 
 }
 
+void left_motor(int dir, int spd) {
+     left_front.setMotorDirection(dir);
+     left_front.setSpeed(spd);   
+     left_back.setMotorDirection(!dir);
+     left_back.setSpeed(spd);
+}
+
+void right_motor(int dir, int spd) {
+     right_front.setMotorDirection(dir);
+     right_front.setSpeed(spd);   
+     right_back.setMotorDirection(!dir);
+     right_back.setSpeed(spd);
+}
+
 void turn_left() {
      if (current_direction == RIGHT) {
         stop_movement();
         current_direction = 0;
         return;
-     }  
-     left.setMotorDirection(MOTOR_FORWARD);
-     left.setSpeed(MOTOR_SPEED);   
-     //right.setMotorDirection(MOTOR_BACKWARD);
-     //right.setSpeed(MOTOR_SPEED / 2);
-     current_direction = LEFT;
+     } else if (current_direction == FORWARD_RIGHT) {
+        go_forward();
+     }
+     if (current_direction == FORWARD) {
+        left_motor(MOTOR_FORWARD, MOTOR_SPEED + 70);
+        right_motor(MOTOR_BACKWARDS, MOTOR_SPEED / 2);
+        current_direction = FORWARD_LEFT;
+     } else {
+        left_motor(MOTOR_FORWARD, MOTOR_SPEED / 2);
+        right_motor(MOTOR_BACKWARDS, MOTOR_SPEED / 2);
+        current_direction = LEFT;
+     }
 }
 
 void turn_right() {
@@ -79,12 +106,18 @@ void turn_right() {
         stop_movement();
         current_direction = 0;
         return;
+     } else if (current_direction == FORWARD_LEFT) {
+        go_forward();
      }
-     //right.setMotorDirection(MOTOR_FORWARD);
-     //right.setSpeed(MOTOR_SPEED);   
-     left.setMotorDirection(MOTOR_BACKWARD);
-     left.setSpeed(MOTOR_SPEED / 2);   
-     current_direction = RIGHT;
+     if (current_direction == FORWARD) {
+        right_motor(MOTOR_FORWARD, MOTOR_SPEED + 70);
+        left_motor(MOTOR_BACKWARDS, MOTOR_SPEED / 2);
+        current_direction = FORWARD_RIGHT;
+     } else {
+        right_motor(MOTOR_FORWARD, MOTOR_SPEED / 2);
+        left_motor(MOTOR_BACKWARDS, MOTOR_SPEED / 2);
+        current_direction = RIGHT;
+     }
 }
 
 void go_forward() {
@@ -93,10 +126,13 @@ void go_forward() {
         current_direction = 0;
         return;
      }
-     //right.setMotorDirection(MOTOR_FORWARD);
-     //right.setSpeed(MOTOR_SPEED);   
-     left.setMotorDirection(MOTOR_FORWARD);
-     left.setSpeed(MOTOR_SPEED);   
+     if (current_direction == FORWARD) {
+         left_motor(MOTOR_FORWARD, MOTOR_SPEED + 100);
+         right_motor(MOTOR_FORWARD, MOTOR_SPEED + 100);
+     } else {
+         left_motor(MOTOR_FORWARD, MOTOR_SPEED);
+         right_motor(MOTOR_FORWARD, MOTOR_SPEED);
+     }
      current_direction = FORWARD;
 }
 
@@ -106,32 +142,16 @@ void go_backwards() {
         current_direction = 0;
         return;
      }
-     //right.setMotorDirection(MOTOR_BACKWARD);
-     //right.setSpeed(MOTOR_SPEED);   
-     left.setMotorDirection(MOTOR_BACKWARD);
-     left.setSpeed(MOTOR_SPEED);   
+     left_motor(MOTOR_BACKWARDS, MOTOR_SPEED);
+     right_motor(MOTOR_BACKWARDS, MOTOR_SPEED);
      current_direction = BACKWARD;
 }
 
 void stop_movement() {
-     //right.setSpeed(0);   
-     left.setSpeed(0); 
-}
-
-void motorCommand(String side, int dir, int spd) {
-  
-  if (side == "left") {
-     left.setMotorDirection(dir);
-     left.setSpeed(spd);
-  } else if (side == "right") {
-     right.setMotorDirection(dir);
-     right.setSpeed(spd); 
-  } else if (side == "both") {
-     left.setMotorDirection(dir);
-     left.setSpeed(spd); 
-     right.setMotorDirection(dir);
-     right.setSpeed(spd); 
-  }
+     right_front.setSpeed(0);   
+     right_back.setSpeed(0); 
+     left_front.setSpeed(0); 
+     left_back.setSpeed(0); 
 }
 
 
