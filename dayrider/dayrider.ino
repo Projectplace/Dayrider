@@ -3,7 +3,7 @@
 
 #include <Dagu4Motor.h>
 
-                 // pwm, dir, cur(analog), encA, encB 
+                 // pwm, dir, cur(analog), encA, encB
 Dagu4Motor left_front(5, 4, 0, 0, 0);
 Dagu4Motor left_back(3, 2, 0, 0, 0);
 Dagu4Motor right_front(11, 12, 0, 0, 0);
@@ -16,7 +16,7 @@ void setup() {
   Bridge.begin();
   Mailbox.begin();
   digitalWrite(13, HIGH);
-    
+
   left_front.begin();
   left_front.stopMotors();
   left_back.begin();
@@ -25,15 +25,7 @@ void setup() {
   right_front.stopMotors();
   right_back.begin();
   right_back.stopMotors();
-  
-}
 
-void loop() {
-  if (Mailbox.messageAvailable()) {
-    process_cmd();
-  }
-
-  delay(10); 
 }
 
 #define LEFT 1
@@ -50,36 +42,52 @@ void loop() {
 
 int current_direction = 0;
 
-void process_cmd() {
-  String cmd;
-  
-  Mailbox.readMessage(cmd);
-  if (cmd == "left") {
-    turn_left();
-  } else if (cmd == "right") {
-    turn_right();
-  } else if (cmd == "forward") {
-    go_forward();
-  } else if (cmd == "backward") {
-    go_backwards();
-  }
-
-  //Serial.println(cmd);
-
-}
-
 void left_motor(int dir, int spd) {
      left_front.setMotorDirection(dir);
-     left_front.setSpeed(spd);   
+     left_front.setSpeed(spd);
      left_back.setMotorDirection(!dir);
      left_back.setSpeed(spd);
 }
 
 void right_motor(int dir, int spd) {
      right_front.setMotorDirection(dir);
-     right_front.setSpeed(spd);   
+     right_front.setSpeed(spd);
      right_back.setMotorDirection(!dir);
      right_back.setSpeed(spd);
+}
+
+void stop_movement() {
+     right_front.setSpeed(0);
+     right_back.setSpeed(0);
+     left_front.setSpeed(0);
+     left_back.setSpeed(0);
+}
+
+void go_forward() {
+     if (current_direction == BACKWARD) {
+        stop_movement();
+        current_direction = 0;
+        return;
+     }
+     if (current_direction == FORWARD) {
+         left_motor(MOTOR_FORWARD, MOTOR_SPEED + 100);
+         right_motor(MOTOR_FORWARD, MOTOR_SPEED + 100);
+     } else {
+         left_motor(MOTOR_FORWARD, MOTOR_SPEED);
+         right_motor(MOTOR_FORWARD, MOTOR_SPEED);
+     }
+     current_direction = FORWARD;
+}
+
+void go_backwards() {
+     if (current_direction == FORWARD) {
+        stop_movement();
+        current_direction = 0;
+        return;
+     }
+     left_motor(MOTOR_BACKWARDS, MOTOR_SPEED);
+     right_motor(MOTOR_BACKWARDS, MOTOR_SPEED);
+     current_direction = BACKWARD;
 }
 
 void turn_left() {
@@ -120,38 +128,29 @@ void turn_right() {
      }
 }
 
-void go_forward() {
-     if (current_direction == BACKWARD) {
-        stop_movement();
-        current_direction = 0;
-        return;
-     }
-     if (current_direction == FORWARD) {
-         left_motor(MOTOR_FORWARD, MOTOR_SPEED + 100);
-         right_motor(MOTOR_FORWARD, MOTOR_SPEED + 100);
-     } else {
-         left_motor(MOTOR_FORWARD, MOTOR_SPEED);
-         right_motor(MOTOR_FORWARD, MOTOR_SPEED);
-     }
-     current_direction = FORWARD;
+void poll_mailbox() {
+  String cmd;
+
+  if (!Mailbox.messageAvailable()) {
+      return;
+  }
+
+  Mailbox.readMessage(cmd);
+  if (cmd == "left") {
+    turn_left();
+  } else if (cmd == "right") {
+    turn_right();
+  } else if (cmd == "forward") {
+    go_forward();
+  } else if (cmd == "backward") {
+    go_backwards();
+  }
+
 }
 
-void go_backwards() {
-     if (current_direction == FORWARD) {
-        stop_movement();
-        current_direction = 0;
-        return;
-     }
-     left_motor(MOTOR_BACKWARDS, MOTOR_SPEED);
-     right_motor(MOTOR_BACKWARDS, MOTOR_SPEED);
-     current_direction = BACKWARD;
+void loop() {
+
+  poll_mailbox();
+
+  delay(10);
 }
-
-void stop_movement() {
-     right_front.setSpeed(0);   
-     right_back.setSpeed(0); 
-     left_front.setSpeed(0); 
-     left_back.setSpeed(0); 
-}
-
-
