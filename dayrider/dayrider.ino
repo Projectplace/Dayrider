@@ -2,12 +2,19 @@
 #include <Mailbox.h>
 
 #include <Dagu4Motor.h>
-
+#include <Adafruit_NeoPixel.h>
+#include "NeoPixel.h"
                  // pwm, dir, cur(analog), encA, encB
 Dagu4Motor left_front(5, 4, 0, 0, 0);
 Dagu4Motor left_back(3, 2, 0, 0, 0);
 Dagu4Motor right_front(11, 12, 0, 0, 0);
 Dagu4Motor right_back(9, 8, 0, 0, 0);
+
+// NeoPixel - KIT emulation :D
+#define PIXEL_PIN 6
+#define PIXEL_COUNT 8
+#define KIT_LIGHT_DELAY 40 // in milliseconds
+NeoPixel pixel = NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
   //Serial.begin(9600);
@@ -26,6 +33,8 @@ void setup() {
   right_back.begin();
   right_back.stopMotors();
 
+  pixel.begin();
+  pixel.reset();
 }
 
 #define LEFT 1
@@ -41,6 +50,7 @@ void setup() {
 #define MOTOR_SPEED 100
 
 int current_direction = 0;
+int prevMillis = 0;
 
 void left_motor(int dir, int spd) {
      left_front.setMotorDirection(dir);
@@ -149,7 +159,11 @@ void poll_mailbox() {
 }
 
 void loop() {
-
+  unsigned long curMillis = millis();
+  if (curMillis - prevMillis >= KIT_LIGHT_DELAY) {
+    prevMillis = curMillis;
+    pixel.kitLightNoTimer();
+  }
   poll_mailbox();
 
   delay(10);
