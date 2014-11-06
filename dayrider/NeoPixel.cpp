@@ -3,9 +3,17 @@
 
 NeoPixel::NeoPixel(uint16_t n, uint8_t p, uint8_t t) : Adafruit_NeoPixel(n, p, t) {
   kitLightState = 0;
+  previous_millis = 0;
+  kitLightEnabled = 0;
 }
 
 void NeoPixel::toggleKitLight(bool enabled) {
+  kitLightEnabled = enabled;
+  reset();
+}
+
+void NeoPixel::kitLightTimer(bool enabled) {
+
   uint32_t color = 0xFF0000; // Hardcoded color to red
   int wait = 64;
 
@@ -14,7 +22,7 @@ void NeoPixel::toggleKitLight(bool enabled) {
    	return;
   }
 
-  for (int i = 0; i < numPixels(); i++) {
+  for (uint16_t i = 0; i < numPixels(); i++) {
     setPixelColor(i, color);
     show();
     delay(wait);
@@ -24,7 +32,7 @@ void NeoPixel::toggleKitLight(bool enabled) {
     }
     show();
   }
-  for (int i = numPixels() - 1; i >= 0; i--) {
+  for (uint16_t i = numPixels() - 1; i >= 0; i--) {
     setPixelColor(i, color);
     show();
     delay(wait);
@@ -77,7 +85,19 @@ void NeoPixel::kitLightNoTimer() {
   show();
 }
 
+void NeoPixel::poll() {
+  unsigned long current_millis = millis();
+  if (!kitLightEnabled) {
+    return;
+  }
+  if ((current_millis - previous_millis >= KIT_LIGHT_DELAY) || (current_millis < previous_millis)) {
+    previous_millis = current_millis;
+    kitLightNoTimer();
+  }
+}
+
 void NeoPixel::toggleHeadLights(bool enabled) {
+        kitLightEnabled = false;
 	if (enabled) {
 		setPixelColor(0, 0xFFFFFF);
 		setPixelColor(1, 0XFFFFFF);
@@ -90,7 +110,7 @@ void NeoPixel::toggleHeadLights(bool enabled) {
 }
 
 void NeoPixel::reset() {
-	for (int i = 0; i < numPixels(); i++) {
+	for (uint16_t i = 0; i < numPixels(); i++) {
 		setPixelColor(i, 0x000000);
 		show();
 	}

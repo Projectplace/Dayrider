@@ -33,8 +33,6 @@ void Movement::begin() {
   right_front.stopMotors();
   right_back.begin();
   right_back.stopMotors();
-  Bridge.begin();
-  Mailbox.begin();
 }
 
 void Movement::left_motor(int dir, int spd) {
@@ -109,9 +107,7 @@ void Movement::turn_right() {
      movement_count = 0;
 }
 
-void Movement::poll_mailbox() {
-  String cmd;
-
+void Movement::poll() {
   if (current_direction != 0) {
       movement_count = movement_count + 1;
       if ((movement_count == 100) && ((current_direction == RIGHT) || (current_direction == LEFT))) {
@@ -121,20 +117,5 @@ void Movement::poll_mailbox() {
           stop_movement();
       }
   }
-
-  if (!Mailbox.messageAvailable()) {
-      return;
-  }
-
-  Mailbox.readMessage(cmd);
-  if (cmd == "left") {
-    turn_left();
-  } else if (cmd == "right") {
-    turn_right();
-  } else if (cmd == "forward") {
-    go_forward();
-  } else if (cmd == "backward") {
-    go_backwards();
-  }
-
+  return;
 }
