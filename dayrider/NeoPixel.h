@@ -2,7 +2,7 @@
     NeoPixel.h - 
 */
 #include <Arduino.h>
-#include <../../../../libraries/Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h>
 
 #ifndef NeoPixel_h
 #define NeoPixel_h

@@ -17,9 +17,9 @@
 
 Movement::Movement(int rf_pwm, int rf_dir, int rb_pwm, int rb_dir, int lf_pwm, int lf_dir, int lb_pwm, int lb_dir) :
   right_front(rf_pwm, rf_dir, 0, 0, 0),
-  right_back(rb_pwm, rf_dir, 0, 0, 0),
+  right_back(rb_pwm, rb_dir, 0, 0, 0),
   left_front(lf_pwm, lf_dir, 0, 0, 0),
-  left_back(lb_pwm, lf_dir, 0, 0, 0) {
+  left_back(lb_pwm, lb_dir, 0, 0, 0) {
   current_direction = 0;
   movement_count = 0; 
 }
@@ -33,6 +33,7 @@ void Movement::begin() {
   right_front.stopMotors();
   right_back.begin();
   right_back.stopMotors();
+  Bridge.begin();
   Mailbox.begin();
 }
 
