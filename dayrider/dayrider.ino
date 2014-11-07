@@ -6,6 +6,7 @@
 #include "Movement.h"
 #include <Adafruit_NeoPixel.h>
 #include "NeoPixel.h"
+#include "CollisionSensor.h"
 
 Movement movement = Movement(11, 12, 9, 8, 5, 4, 3, 2);
 
@@ -17,7 +18,16 @@ Movement movement = Movement(11, 12, 9, 8, 5, 4, 3, 2);
 #define HEADLIGHT_MODE_CARLIGHT 2
 #define HEADLIGHT_MODE_OFF 3
 
+// Collision sensor
+#define SERVO_PIN A0 // Analog 0
+#define ECHO_PIN 10
+#define TRIG_PIN 7
+#define COLLISION_DISTANCE 50 // in centimeters
+
 NeoPixel pixel = NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+CollisionSensor s1 = CollisionSensor(SERVO_PIN, ECHO_PIN, TRIG_PIN, COLLISION_DISTANCE);
+
 unsigned long previous_command_millis = 0;
 unsigned long was_running_millis = 0;
 int headlight_mode = HEADLIGHT_MODE_AUTO;
@@ -106,6 +116,9 @@ void loop() {
 
   poll_mailbox();
 
+  if (s1.collisionDetected()) {
+    movement.stop_movement();
+  }
   movement.poll();
 
   pixel.poll();
