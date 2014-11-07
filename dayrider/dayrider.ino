@@ -41,6 +41,7 @@ void setup() {
   movement.begin();
   pixel.begin();
   pixel.reset();
+  s1.begin();
   digitalWrite(13, HIGH); // ready to go
 }
 
