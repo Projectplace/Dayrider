@@ -14,6 +14,14 @@
     <body>
 
         <h2>Dayrider</h2>
+   
+        Headlights:
+        <span id="headlights">
+        <input type="radio" name="headlights" value="auto" checked>Auto</input>
+        <input type="radio" name="headlights" value="kitmode">Kitmode</input>
+        <input type="radio" name="headlights" value="carlight">Carlight</input>
+        <input type="radio" name="headlights" value="off">Off</input>
+        </span>
 
         <p>Control the dayrider with the arrow keys!</p>
 
@@ -39,21 +47,34 @@ var onkeydown = function(e) {
        return;
     }
 
-    $('spinner').show();
+    $('#spinner').show();
     $(document).unbind('keydown');
     xhr = jQuery.get('/mailbox/' + dir);
     xhr.always(function() {
-         $('spinner').hide();
+         $('#spinner').hide();
          $(document).keydown(onkeydown);
     });
     xhr.fail(function() {
-         $('.errors').append("<li>Error sending event "+dir+"</li>");
+         $('.errors').append("<li>Error sending movement "+dir+"</li>");
     });
 
 };
 
+var onheadlightchange = function(e) {
+    var mode = $("#headlights input[type='radio']:checked").val();
+    $('#spinner').show();
+    xhr = jQuery.get('/mailbox/headlight/' + mode);
+    xhr.always(function() {
+         $('#spinner').hide();
+    });
+    xhr.fail(function() {
+         $('.errors').append("<li>Error sending headlight mode "+mode+"</li>");
+    });
+};
+
 $(document).ready(function() {
     $(document).keydown(onkeydown);
+    $("#headlights input[type='radio']").change(onheadlightchange);
 });
 </script>
     </body>
