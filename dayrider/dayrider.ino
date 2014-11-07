@@ -8,7 +8,7 @@
 #include "NeoPixel.h"
 #include "CollisionSensor.h"
 
-Movement movement = Movement(5, 4, 3, 2, 11, 12, 9, 8);
+Movement movement = Movement(11, 12, 5, 4);
 
 // NeoPixel - KIT emulation :D
 #define PIXEL_PIN 6
@@ -117,9 +117,9 @@ void loop() {
 
   poll_mailbox();
 
-  if (s1.collisionDetected() && movement.current_direction == FORWARD ) {
-    movement.stop_movement();
-  }
+  //if (s1.collisionDetected() && movement.current_direction == FORWARD ) {
+  //  movement.stop_movement();
+  //}
   movement.poll();
 
   pixel.poll();

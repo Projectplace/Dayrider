@@ -9,18 +9,18 @@
 #define RIGHT 2
 #define FORWARD 3
 #define BACKWARD 4
+#define FORWARD_LEFT 5
+#define FORWARD_RIGHT 6
 
 class Movement {  
-  Dagu4Motor right_front;
-  Dagu4Motor right_back;
-  Dagu4Motor left_front;
-  Dagu4Motor left_back;
+  Dagu4Motor right;
+  Dagu4Motor left;
   void left_motor(int dir, int spd);
   void right_motor(int dir, int spd);
   int movement_count;
 
 public:  
-  Movement(int rf_pwm, int rf_dir, int rb_pwm, int rb_dir, int lf_pwm, int lf_dir, int lb_pwm, int lb_dir);
+  Movement(int right_pwm, int right_dir, int left_pwm, int left_dir);
   void stop_movement();
   void begin();
   void poll();
