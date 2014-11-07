@@ -99,6 +99,7 @@ void NeoPixel::poll() {
 void NeoPixel::toggleHeadLights(bool enabled) {
         kitLightEnabled = false;
 	if (enabled) {
+          reset();
 		setPixelColor(0, 0xFFFFFF);
 		setPixelColor(1, 0XFFFFFF);
 		setPixelColor(numPixels() - 1, 0xFFFFFF);
