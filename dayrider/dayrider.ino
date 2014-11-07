@@ -117,7 +117,7 @@ void loop() {
 
   poll_mailbox();
 
-  if (s1.collisionDetected()) {
+  if (s1.collisionDetected() && movement.current_direction == FORWARD ) {
     movement.stop_movement();
   }
   movement.poll();

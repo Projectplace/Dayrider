@@ -5,6 +5,11 @@
 #include "Arduino.h"
 #include <Dagu4Motor.h>
 
+#define LEFT 1
+#define RIGHT 2
+#define FORWARD 3
+#define BACKWARD 4
+
 class Movement {  
   Dagu4Motor right_front;
   Dagu4Motor right_back;

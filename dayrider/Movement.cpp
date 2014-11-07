@@ -1,18 +1,11 @@
 
 #include "Movement.h"
 
-#define LEFT 1
-#define RIGHT 2
-#define FORWARD 3
-#define BACKWARD 4
-#define FORWARD_LEFT 5
-#define FORWARD_RIGHT 6
-
 #define MOTOR_FORWARD 1
 #define MOTOR_BACKWARDS 0
 
-#define MOTOR_SPEED 100
-#define MOTOR_TURN_SPEED 85
+#define MOTOR_SPEED 120
+#define MOTOR_TURN_SPEED 100
 #define MOTOR_FAST_SPEED 255
 
 Movement::Movement(int rf_pwm, int rf_dir, int rb_pwm, int rb_dir, int lf_pwm, int lf_dir, int lb_pwm, int lb_dir) :
