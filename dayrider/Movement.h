@@ -12,11 +12,11 @@ class Movement {
   Dagu4Motor left_back;
   void left_motor(int dir, int spd);
   void right_motor(int dir, int spd);
-  void stop_movement();
   int movement_count;
 
 public:  
   Movement(int rf_pwm, int rf_dir, int rb_pwm, int rb_dir, int lf_pwm, int lf_dir, int lb_pwm, int lb_dir);
+  void stop_movement();
   void begin();
   void poll();
   void go_forward();
