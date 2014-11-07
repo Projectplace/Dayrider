@@ -110,7 +110,7 @@ void Movement::turn_right() {
 void Movement::poll() {
   if (current_direction != 0) {
       movement_count = movement_count + 1;
-      if ((movement_count == 100) && ((current_direction == RIGHT) || (current_direction == LEFT))) {
+      if ((movement_count == 50) && ((current_direction == RIGHT) || (current_direction == LEFT))) {
           stop_movement();
       }
       if ((movement_count == 500) && ((current_direction == FORWARD) || (current_direction == BACKWARD))) {

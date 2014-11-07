@@ -8,7 +8,7 @@
 #include "NeoPixel.h"
 #include "CollisionSensor.h"
 
-Movement movement = Movement(11, 12, 9, 8, 5, 4, 3, 2);
+Movement movement = Movement(5, 4, 3, 2, 11, 12, 9, 8);
 
 // NeoPixel - KIT emulation :D
 #define PIXEL_PIN 6
