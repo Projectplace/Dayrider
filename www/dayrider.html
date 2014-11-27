@@ -13,43 +13,57 @@
     </head>
     <body>
 
+      
         <h2>Dayrider</h2>
    
-        Headlights:
-        <span id="headlights">
-        <input type="radio" name="headlights" value="auto" checked>Auto</input>
-        <input type="radio" name="headlights" value="kitmode">Kitmode</input>
-        <input type="radio" name="headlights" value="carlight">Carlight</input>
-        <input type="radio" name="headlights" value="off">Off</input>
-        </span>
-
-        <p>Control the dayrider with the arrow keys!</p>
-
-        <p id="spinner" style="display:none">Please wait..</p>
-
-        <ul class="errors"></ul>
+        <div style="float:left; margin:1em;">
+        
+          Headlights:
+          <span id="headlights">
+            <input type="radio" name="headlights" value="auto" checked>Auto</input>
+            <input type="radio" name="headlights" value="kitmode">Kitmode</input>
+            <input type="radio" name="headlights" value="carlight">Carlight</input>
+            <input type="radio" name="headlights" value="off">Off</input>
+          </span>
+          
+          <p>Control the dayrider with the arrow keys!</p>
+          
+          <p id="spinner" style="display:none">Please wait..</p>
+          
+          <ul class="errors"></ul>
+        </div>
+        <div style="float:left; margin:1em;">
+          Forward speed <input type="text" id="forward_speed" value="160" size="6"/> <br/>
+          Backward speed <input type="text" id="backward_speed" value="140" size="6"/><br/>
+          Turn speed <input type="text" id="turn_speed" value="80" size="6"/>
+        </div>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <!-- script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')</script -->
 
         <script>
 var onkeydown = function(e) {
+    var dir, spd;
     e = e || window.event;
     if (e.keyCode == 38) {
        dir = 'forward';
+       spd = $('#forward_speed').val();
     } else if (e.keyCode == 40){
-       dir ='backward';
+       dir ='backward'; 
+       spd = $('#backward_speed').val();
     } else if (e.keyCode == 37){
        dir = 'left';
+       spd = $('#turn_speed').val();
     } else if (e.keyCode == 39){
        dir = 'right';
+       spd = $('#turn_speed').val();
     } else {
        return;
     }
 
     $('#spinner').show();
     $(document).unbind('keydown');
-    xhr = jQuery.get('/mailbox/' + dir);
+    xhr = jQuery.get('/mailbox/' + dir + '/' + spd);
     xhr.always(function() {
          $('#spinner').hide();
          $(document).keydown(onkeydown);

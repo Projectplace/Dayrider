@@ -3,7 +3,7 @@
 #define Movement_h
 
 #include "Arduino.h"
-#include <Dagu4Motor.h>
+#include "Motor.h"
 
 #define LEFT 1
 #define RIGHT 2
@@ -13,21 +13,25 @@
 #define FORWARD_RIGHT 6
 
 class Movement {  
-  Dagu4Motor right;
-  Dagu4Motor left;
+  Motor right;
+  Motor left;
   void left_motor(int dir, int spd);
   void right_motor(int dir, int spd);
   int movement_count;
+  int correction;
+  int left_ticks();
+  int right_ticks();
+  void reset_ticks();
 
 public:  
-  Movement(int right_pwm, int right_dir, int left_pwm, int left_dir);
+  Movement(int right_pwm, int right_dir, int right_enc, int left_pwm, int left_dir, int left_enca);
   void stop_movement();
   void begin();
   void poll();
-  void go_forward();
-  void go_backwards();
-  void turn_left();
-  void turn_right();
+  void go_forward(int spd);
+  void go_backwards(int spd);
+  void turn_left(int spd);
+  void turn_right(int spd);
 
   int current_direction;
 };

@@ -1,14 +1,13 @@
-#include <Dagu4Motor.h>
-#include <Encoder.h>
 #include <Bridge.h>
 #include <Mailbox.h>
 
+#include "Motor.h"
 #include "Movement.h"
 #include <Adafruit_NeoPixel.h>
 #include "NeoPixel.h"
 #include "CollisionSensor.h"
 
-Movement movement = Movement(11, 12, 5, 4);
+Movement movement = Movement(11, 12, 2, 5, 4, 3);
 
 // NeoPixel - KIT emulation :D
 #define PIXEL_PIN 6
@@ -35,6 +34,7 @@ int headlight_auto_state = HEADLIGHT_MODE_OFF;
 
 void setup() {
   pinMode(13, OUTPUT);
+  //Serial.begin(9600);
   digitalWrite(13, LOW); // initializing
   Bridge.begin();
   Mailbox.begin();
@@ -55,14 +55,14 @@ void poll_mailbox() {
   previous_command_millis = millis();
 
   Mailbox.readMessage(cmd);
-  if (cmd == "left") {
-    movement.turn_left();
-  } else if (cmd == "right") {
-    movement.turn_right();
-  } else if (cmd == "forward") {
-    movement.go_forward();
-  } else if (cmd == "backward") {
-    movement.go_backwards();
+  if (cmd.substring(0, 4) == "left") {
+    movement.turn_left(cmd.substring(5).toInt());
+  } else if (cmd.substring(0, 5) == "right") {
+    movement.turn_right(cmd.substring(6).toInt());
+  } else if (cmd.substring(0, 7) == "forward") {
+    movement.go_forward(cmd.substring(8).toInt());
+  } else if (cmd.substring(0, 8) == "backward") {
+    movement.go_backwards(cmd.substring(9).toInt());
   } else if (cmd == "headlight/kitmode") {
     pixel.toggleKitLight(true);
     headlight_mode = HEADLIGHT_MODE_KITMODE;
