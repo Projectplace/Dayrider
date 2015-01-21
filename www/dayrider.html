@@ -30,6 +30,7 @@
           
           <p id="spinner" style="display:none">Please wait..</p>
           
+	  <p id="msg"></p>
           <ul class="errors"></ul>
         </div>
         <div style="float:left; margin:1em;">
@@ -38,57 +39,96 @@
           Turn speed <input type="text" id="turn_speed" value="80" size="6"/>
         </div>
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <!-- script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')</script -->
 
         <script>
+
+var ws = null;
+var keypresses = [];
+var ws_ready = function() {
+    $(document).keydown(onkeydown);
+    $(document).keyup(onkeyup);
+    $("#headlights input[type='radio']").change(onheadlightchange);
+    $("#forward_speed").change(onforwardspeedchange);
+};
+var ws_message = function(evt) {
+  var msg = evt.data;
+  if (msg == "HELLO") {
+    ws_ready();
+    $("#msg").html("Connected!");
+  } else if (msg === "OK") {
+    $("#spinner").hide();
+  } else { 
+    $("#msg").html(msg);
+  }
+};
+var ws_connect = function() {
+  $("#msg").html("Connecting...");
+  if (!"WebSocket" in window) {
+     alert("WebSocket NOT supported by your Browser!");
+     return;
+  }
+  ws = new WebSocket("ws://localhost:8080/", "binary");
+  ws.onopen = function() {
+     ws.send("HELLO");
+  };
+  ws.onmessage = ws_message;
+};
+var ws_onclode = function() {
+  $("#msg").html("Disconnected");
+  sleep(3);
+  ws_connect();
+};
 var onkeydown = function(e) {
+   if (-1 == keypresses.indexOf(e.keyCode)) {
+      keypresses.push(e.keyCode);
+      return onkey("down", e);
+   }
+};
+var onkeyup = function(e) {
+   keypresses.splice(keypresses.indexOf(e.keyCode), 1);
+   return onkey("up", e);
+};
+var onkey = function(updown, e) {
     var dir, spd;
     e = e || window.event;
     if (e.keyCode == 38) {
        dir = 'forward';
-       spd = $('#forward_speed').val();
     } else if (e.keyCode == 40){
        dir ='backward'; 
        spd = $('#backward_speed').val();
     } else if (e.keyCode == 37){
        dir = 'left';
-       spd = $('#turn_speed').val();
     } else if (e.keyCode == 39){
        dir = 'right';
-       spd = $('#turn_speed').val();
     } else {
        return;
     }
-
-    $('#spinner').show();
-    $(document).unbind('keydown');
-    xhr = jQuery.get('/mailbox/' + dir + '/' + spd);
-    xhr.always(function() {
-         $('#spinner').hide();
-         $(document).keydown(onkeydown);
-    });
-    xhr.fail(function() {
-         $('.errors').append("<li>Error sending movement "+dir+"</li>");
-    });
-
+    $("#spinner").show();
+    ws.send(updown + "/" + dir + "\n");
+    $(".errors").append("<li>"+updown + "/" + dir + "</li>");
 };
-
 var onheadlightchange = function(e) {
     var mode = $("#headlights input[type='radio']:checked").val();
-    $('#spinner').show();
-    xhr = jQuery.get('/mailbox/headlight/' + mode);
-    xhr.always(function() {
-         $('#spinner').hide();
-    });
-    xhr.fail(function() {
-         $('.errors').append("<li>Error sending headlight mode "+mode+"</li>");
-    });
+    ws.send("headlightmode/" + mode + "\n");
 };
-
+var onturnspeedchange = function(e) {
+    var spd = $('#turnward_speed').val();
+    ws.send("turnspeed/" + spd + "\n");
+};
+var onforwardspeedchange = function(e) {
+    var spd = $('#forward_speed').val();
+    ws.send("forwardspeed/" + spd + "\n");
+};
+var onbackwardspeedchange = function(e) {
+    var spd = $('#backward_speed').val();
+    ws.send("backwardspeed/" + spd + "\n");
+};
 $(document).ready(function() {
-    $(document).keydown(onkeydown);
-    $("#headlights input[type='radio']").change(onheadlightchange);
+    ws_connect();
+    ws_ready();
+    
 });
 </script>
     </body>
